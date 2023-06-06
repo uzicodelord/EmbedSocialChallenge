@@ -17,36 +17,53 @@ class ReviewController extends Controller
         });
 
         $prioritizeText = $request->input('prioritize_text');
-        $reviewsWithText = array_filter($reviews, function ($review) {
-            return !empty($review['text']);
-        });
-        $reviewsWithoutText = array_filter($reviews, function ($review) {
-            return empty($review['text']);
-        });
 
-        $ratingOrder = $request->input('rating_order');
-        $dateOrder = $request->input('date_order');
+        if ($prioritizeText === 'yes') {
+            $reviewsWithText = array_filter($reviews, function ($review) {
+                return !empty($review['reviewText']);
+            });
 
-        usort($reviewsWithText, function ($a, $b) use ($ratingOrder, $dateOrder) {
-            if (isset($a['rating'], $a['date'], $b['rating'], $b['date']) && $a['rating'] === $b['rating']) {
-                return $dateOrder === 'newest_first' ? strtotime($a['date']) - strtotime($b['date']) : strtotime($b['date']) - strtotime($a['date']);
-            }
+            $reviewsWithoutText = array_filter($reviews, function ($review) {
+                return empty($review['reviewText']);
+            });
 
-            return $ratingOrder === 'highest_first' ? $b['rating'] - $a['rating'] : $a['rating'] - $b['rating'];
-        });
+            $ratingOrder = $request->input('rating_order');
+            $dateOrder = $request->input('date_order');
 
-        usort($reviewsWithoutText, function ($a, $b) use ($ratingOrder, $dateOrder) {
-            if (isset($a['rating'], $a['date'], $b['rating'], $b['date']) && $a['rating'] === $b['rating']) {
-                return $dateOrder === 'newest_first' ? strtotime($a['date']) - strtotime($b['date']) : strtotime($b['date']) - strtotime($a['date']);
-            }
+            usort($reviewsWithText, function ($a, $b) use ($dateOrder) {
+                if ($a['rating'] === $b['rating']) {
+                    return strtotime($a['reviewCreatedOnDate']) - strtotime($b['reviewCreatedOnDate']);
+                }
 
-            return $ratingOrder === 'highest_first' ? $b['rating'] - $a['rating'] : $a['rating'] - $b['rating'];
-        });
+                return $b['rating'] - $a['rating'];
+            });
 
+            usort($reviewsWithoutText, function ($a, $b) use ($dateOrder) {
+                if ($a['rating'] === $b['rating']) {
+                    return strtotime($a['reviewCreatedOnDate']) - strtotime($b['reviewCreatedOnDate']);
+                }
 
-        // Merge and return the sorted reviews
-        $sortedReviews = array_merge($reviewsWithText, $reviewsWithoutText);
+                return $b['rating'] - $a['rating'];
+            });
 
-        return view('reviews', ['reviews' => $sortedReviews]);
+            // Merge and return the sorted reviews
+            $sortedReviews = array_merge($reviewsWithText, $reviewsWithoutText);
+        } else {
+            $ratingOrder = $request->input('rating_order');
+            $dateOrder = $request->input('date_order');
+
+            usort($reviews, function ($a, $b) use ($dateOrder) {
+                if ($a['rating'] === $b['rating']) {
+                    return strtotime($a['reviewCreatedOnDate']) - strtotime($b['reviewCreatedOnDate']);
+                }
+
+                return $b['rating'] - $a['rating'];
+            });
+
+            $sortedReviews = $reviews;
+        }
+
+        return view('filter_reviews', ['sortedReviews' => $sortedReviews]);
     }
 }
+

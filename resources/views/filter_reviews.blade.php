@@ -46,7 +46,7 @@
     </form>
 
     @isset($sortedReviews)
-        <h2>Sorted Reviews:</h2>
+        <h2>Reviews:</h2>
         <table class="table">
             <thead>
             <tr>
@@ -56,11 +56,12 @@
             </tr>
             </thead>
             <tbody>
+
             @foreach($sortedReviews as $review)
                 <tr>
                     <td>{{ $review['rating'] }}</td>
-                    <td>{{ $review['date'] }}</td>
-                    <td>{{ $review['text'] }}</td>
+                    <td>{{ $review['reviewCreatedOnDate'] }}</td>
+                    <td>{{ $review['reviewText'] }}</td>
                 </tr>
             @endforeach
             </tbody>
