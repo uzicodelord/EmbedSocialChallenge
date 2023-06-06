@@ -44,6 +44,7 @@ class ReviewController extends Controller
         });
 
 
+        // Merge and return the sorted reviews
         $sortedReviews = array_merge($reviewsWithText, $reviewsWithoutText);
 
         return view('reviews', ['reviews' => $sortedReviews]);

@@ -1,5 +1,3 @@
-<!-- resources/views/filter_reviews.blade.php -->
-
 <!DOCTYPE html>
 <html>
 <head>
